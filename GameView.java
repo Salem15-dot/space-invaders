@@ -33,6 +33,7 @@ public class GameView extends JPanel {
             g2.setColor(new Color(red, green, blue));
             g2.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
         }
+        drawUfo(g2);
         drawBullets(g2);
         drawHud(g2);
         drawGameOver(g2);
@@ -64,6 +65,16 @@ public class GameView extends JPanel {
                 g2.fillRect(x, y, GameModel.ALIEN_WIDTH, GameModel.ALIEN_HEIGHT);
             }
         }
+    }
+
+    private void drawUfo(Graphics2D g2) {
+        java.awt.Rectangle ufo = model.getUfo();
+        if (ufo == null) {
+            return;
+        }
+
+        g2.setColor(new Color(255, 90, 220));
+        g2.fillRect(ufo.x, ufo.y, ufo.width, ufo.height);
     }
 
     private void drawBullets(Graphics2D g2) {

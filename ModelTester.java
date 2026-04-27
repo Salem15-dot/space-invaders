@@ -14,6 +14,8 @@ public class ModelTester {
         testDestroyingAlienIncreasesScore();
         testLosingAllLivesTriggersGameOver();
         testResetRestoresDefaultStartingState();
+        testUfoDespawnsAtEdge();
+        testUfoCollisionAddsThreeHundredPoints();
 
         System.out.println();
         System.out.println("Summary: " + passCount + " passed, " + failCount + " failed.");
@@ -189,6 +191,33 @@ public class ModelTester {
         assertCondition("reset restores aliens", aliensRestored, "Expected all aliens to be alive again");
         assertCondition("reset restores player position", model.getPlayerX() == freshModel.getPlayerX(), "Expected player x=" + freshModel.getPlayerX() + " but was x=" + model.getPlayerX());
         assertCondition("reset restores recommended timer interval", model.getRecommendedTimerInterval() == freshModel.getRecommendedTimerInterval(), "Expected timer interval " + freshModel.getRecommendedTimerInterval() + " but was " + model.getRecommendedTimerInterval());
+    }
+
+    private static void testUfoDespawnsAtEdge() throws Exception {
+        GameModel model = new GameModel();
+
+        setPrivateField(model, "ufo", new java.awt.Rectangle(GameModel.WORLD_WIDTH - 1, GameModel.UFO_Y, GameModel.UFO_WIDTH, GameModel.UFO_HEIGHT));
+        setPrivateIntField(model, "ufoDirectionX", 1);
+        setPrivateIntField(model, "ufoSpawnCooldownTicks", 0);
+
+        model.tick();
+        model.tick();
+
+        assertCondition("UFO despawns safely at the opposite edge", model.getUfo() == null, "Expected UFO to be null after leaving screen");
+    }
+
+    private static void testUfoCollisionAddsThreeHundredPoints() throws Exception {
+        GameModel model = new GameModel();
+
+        setPrivateField(model, "ufo", new java.awt.Rectangle(200, GameModel.UFO_Y, GameModel.UFO_WIDTH, GameModel.UFO_HEIGHT));
+        setPrivateIntField(model, "ufoDirectionX", 0);
+        setPrivateField(model, "playerBullet", new GameModel.Bullet(200, GameModel.UFO_Y, GameModel.PLAYER_BULLET_WIDTH, GameModel.PLAYER_BULLET_HEIGHT, 0));
+
+        int before = model.getScore();
+        model.tick();
+
+        assertCondition("UFO hit adds 300 points", model.getScore() == before + 300, "Expected score increase of 300 but was " + (model.getScore() - before));
+        assertCondition("UFO is removed after collision", model.getUfo() == null, "Expected UFO to be removed after collision");
     }
 
     @SuppressWarnings("unchecked")

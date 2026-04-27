@@ -167,5 +167,24 @@ In ModelTester.java, write boundary tests verifying the UFO despawns safely if i
 
 
 
-results : changes in the 3 files again, 
+results : changes in the 3 files again, the tester passes the 17 test: 
+"PASS: Player x never goes below zero after repeated left movement
+PASS: Player cannot move past left edge
+PASS: Player cannot move past right edge
+PASS: Firing while bullet in flight does nothing
+PASS: Player bullet is removed after reaching top
+PASS: Destroying an alien increases score
+PASS: Losing all lives triggers game-over state
+PASS: reset restores score to zero
+PASS: reset restores lives to three
+PASS: reset clears player bullet
+PASS: reset clears alien bullets
+PASS: reset restores aliens
+PASS: reset restores player position
+PASS: reset restores recommended timer interval
+PASS: UFO despawns safely at the opposite edge
+PASS: UFO hit adds 300 points
+PASS: UFO is removed after collision
+
+Summary: 17 passed, 0 failed."
 

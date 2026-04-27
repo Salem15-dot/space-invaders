@@ -32,6 +32,11 @@ public class GameModel {
     public static final int ALIEN_BULLET_HEIGHT = 10;
     public static final int ALIEN_BULLET_SPEED = 8;
 
+    public static final int UFO_WIDTH = 48;
+    public static final int UFO_HEIGHT = 22;
+    public static final int UFO_Y = 18;
+    public static final int UFO_SPEED_X = 10;
+
     public static final int SHIELD_COUNT = 4;
     public static final int SHIELD_WIDTH = 90;
     public static final int SHIELD_HEIGHT = 30;
@@ -46,6 +51,9 @@ public class GameModel {
     private static final int ALIEN_FIRE_MIN_COOLDOWN = 15;
     private static final int ALIEN_FIRE_MAX_COOLDOWN = 55;
     private static final int SCORE_PER_ALIEN = 10;
+    private static final int SCORE_PER_UFO = 300;
+    private static final int UFO_SPAWN_MIN_COOLDOWN = 240;
+    private static final int UFO_SPAWN_MAX_COOLDOWN = 480;
     private static final int SHIELD_START_X = (WORLD_WIDTH - (SHIELD_COUNT * SHIELD_WIDTH
             + (SHIELD_COUNT - 1) * SHIELD_GAP)) / 2;
 
@@ -60,6 +68,9 @@ public class GameModel {
     private int aliensDirectionX = 1;
     private Bullet playerBullet;
     private int alienFireCooldownTicks;
+    private int ufoSpawnCooldownTicks;
+    private Rectangle ufo;
+    private int ufoDirectionX;
     private int destroyedAliens;
     private int recommendedTimerIntervalMs = BASE_TIMER_INTERVAL_MS;
     private int score;
@@ -77,6 +88,10 @@ public class GameModel {
         playerBullet = null;
         alienBullets.clear();
         alienFireCooldownTicks = 0;
+        ufoSpawnCooldownTicks = random.nextInt(UFO_SPAWN_MAX_COOLDOWN - UFO_SPAWN_MIN_COOLDOWN + 1)
+            + UFO_SPAWN_MIN_COOLDOWN;
+        ufo = null;
+        ufoDirectionX = 1;
         destroyedAliens = 0;
         recommendedTimerIntervalMs = BASE_TIMER_INTERVAL_MS;
         score = 0;
@@ -121,6 +136,7 @@ public class GameModel {
         }
 
         moveAliens();
+        updateUfo();
         advancePlayerBullet();
         advanceAlienBullets();
         fireAlienBulletIfReady();
@@ -173,6 +189,10 @@ public class GameModel {
 
     public List<Shield> getShields() {
         return Collections.unmodifiableList(shields);
+    }
+
+    public Rectangle getUfo() {
+        return ufo == null ? null : new Rectangle(ufo);
     }
 
     public int getScore() {
@@ -274,6 +294,7 @@ public class GameModel {
 
     private void detectCollisions() {
         handlePlayerBulletShieldCollisions();
+        handlePlayerBulletUfoCollision();
         handlePlayerBulletAlienCollision();
         handleAlienBulletShieldCollisions();
         handleAlienPlayerCollisions();
@@ -318,6 +339,20 @@ public class GameModel {
                     return;
                 }
             }
+        }
+    }
+
+    private void handlePlayerBulletUfoCollision() {
+        if (playerBullet == null || ufo == null) {
+            return;
+        }
+
+        if (intersects(playerBullet, ufo.x, ufo.y, ufo.width, ufo.height)) {
+            score += SCORE_PER_UFO;
+            playerBullet = null;
+            ufo = null;
+            ufoSpawnCooldownTicks = random.nextInt(UFO_SPAWN_MAX_COOLDOWN - UFO_SPAWN_MIN_COOLDOWN + 1)
+                    + UFO_SPAWN_MIN_COOLDOWN;
         }
     }
 
@@ -385,6 +420,36 @@ public class GameModel {
                 continue;
             }
         }
+    }
+
+    private void updateUfo() {
+        if (ufo == null) {
+            if (ufoSpawnCooldownTicks > 0) {
+                ufoSpawnCooldownTicks--;
+                return;
+            }
+
+            spawnUfo();
+            return;
+        }
+
+        ufo.x += ufoDirectionX * UFO_SPEED_X;
+        if ((ufoDirectionX > 0 && ufo.x > WORLD_WIDTH) || (ufoDirectionX < 0 && ufo.x + ufo.width < 0)) {
+            despawnUfo();
+        }
+    }
+
+    private void spawnUfo() {
+        boolean moveRight = random.nextBoolean();
+        int startX = moveRight ? -UFO_WIDTH : WORLD_WIDTH;
+        ufoDirectionX = moveRight ? 1 : -1;
+        ufo = new Rectangle(startX, UFO_Y, UFO_WIDTH, UFO_HEIGHT);
+    }
+
+    private void despawnUfo() {
+        ufo = null;
+        ufoSpawnCooldownTicks = random.nextInt(UFO_SPAWN_MAX_COOLDOWN - UFO_SPAWN_MIN_COOLDOWN + 1)
+                + UFO_SPAWN_MIN_COOLDOWN;
     }
 
     private void damageShield(int shieldIndex) {
