@@ -8,16 +8,24 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 public class GameController {
+    private static final String FIRE_SOUND_PATH = "sounds/fire.wav";
+    private static final String HIT_SOUND_PATH = "sounds/hit.wav";
+    private static final String DEATH_SOUND_PATH = "sounds/death.wav";
+
     private final GameModel model;
     private final GameView view;
     private final Timer gameTimer;
 
     private boolean movingLeft;
     private boolean movingRight;
+    private int lastScore;
+    private int lastLives;
 
     public GameController(GameModel model, GameView view) {
         this.model = model;
         this.view = view;
+        this.lastScore = model.getScore();
+        this.lastLives = model.getLives();
 
         configureInput();
         gameTimer = new Timer(model.getRecommendedTimerInterval(), this::onTick);
@@ -65,7 +73,12 @@ public class GameController {
         view.getActionMap().put("fire", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                GameModel.Bullet before = model.getPlayerBullet();
                 model.firePlayerBullet();
+                GameModel.Bullet after = model.getPlayerBullet();
+                if (before == null && after != null) {
+                    SoundPlayer.play(FIRE_SOUND_PATH);
+                }
             }
         });
 
@@ -73,6 +86,8 @@ public class GameController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 model.reset();
+                lastScore = model.getScore();
+                lastLives = model.getLives();
                 gameTimer.setDelay(model.getRecommendedTimerInterval());
                 gameTimer.restart();
             }
@@ -87,6 +102,15 @@ public class GameController {
         }
 
         model.tick();
+        if (model.getScore() > lastScore) {
+            SoundPlayer.play(HIT_SOUND_PATH);
+        }
+        if (model.getLives() < lastLives) {
+            SoundPlayer.play(DEATH_SOUND_PATH);
+        }
+        lastScore = model.getScore();
+        lastLives = model.getLives();
+
         view.repaint();
         gameTimer.setDelay(model.getRecommendedTimerInterval());
 

@@ -5,10 +5,15 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.List;
+import java.util.Random;
 import javax.swing.JPanel;
 
 public class GameView extends JPanel {
     private final GameModel model;
+    private final Random random = new Random();
+    private boolean lastAnimFrameState;
+    private boolean hasLastAnimFrameState;
+    private int animatedShapeVariant = 1;
 
     public GameView(GameModel model) {
         this.model = model;
@@ -52,8 +57,19 @@ public class GameView extends JPanel {
     private void drawAliens(Graphics2D g2) {
         int originX = model.getAliensOriginX();
         int originY = model.getAliensOriginY();
+        boolean animFrame = model.isAnimFrame();
 
-        g2.setColor(new Color(255, 235, 100));
+        if (!hasLastAnimFrameState) {
+            hasLastAnimFrameState = true;
+            lastAnimFrameState = animFrame;
+            if (animFrame) {
+                animatedShapeVariant = random.nextBoolean() ? 1 : 2;
+            }
+        } else if (animFrame && !lastAnimFrameState) {
+            animatedShapeVariant = random.nextBoolean() ? 1 : 2;
+        }
+        lastAnimFrameState = animFrame;
+
         for (int row = 0; row < GameModel.ALIEN_ROWS; row++) {
             for (int col = 0; col < GameModel.ALIEN_COLS; col++) {
                 if (!model.isAlienAlive(row, col)) {
@@ -62,9 +78,43 @@ public class GameView extends JPanel {
 
                 int x = originX + col * (GameModel.ALIEN_WIDTH + GameModel.ALIEN_H_SPACING);
                 int y = originY + row * (GameModel.ALIEN_HEIGHT + GameModel.ALIEN_V_SPACING);
-                g2.fillRect(x, y, GameModel.ALIEN_WIDTH, GameModel.ALIEN_HEIGHT);
+                if (!animFrame) {
+                    drawAlienNormal(g2, x, y);
+                } else {
+                    if (animatedShapeVariant == 1) {
+                        drawAlienAnimatedOne(g2, x, y);
+                    } else {
+                        drawAlienAnimatedTwo(g2, x, y);
+                    }
+                }
             }
         }
+    }
+
+    private void drawAlienNormal(Graphics2D g2, int x, int y) {
+        g2.setColor(new Color(255, 235, 100));
+        g2.fillRect(x + 4, y + 2, GameModel.ALIEN_WIDTH - 8, GameModel.ALIEN_HEIGHT - 4);
+        g2.fillOval(x, y + 3, 10, 10);
+        g2.fillOval(x + GameModel.ALIEN_WIDTH - 10, y + 3, 10, 10);
+    }
+
+    private void drawAlienAnimatedOne(Graphics2D g2, int x, int y) {
+        g2.setColor(new Color(120, 220, 255));
+        g2.fillOval(x + 2, y, GameModel.ALIEN_WIDTH - 4, GameModel.ALIEN_HEIGHT);
+        g2.fillRect(x + 9, y + 4, GameModel.ALIEN_WIDTH - 18, GameModel.ALIEN_HEIGHT - 8);
+        g2.setColor(new Color(230, 245, 255));
+        g2.fillRect(x + 6, y + 7, 6, 4);
+        g2.fillRect(x + GameModel.ALIEN_WIDTH - 12, y + 7, 6, 4);
+    }
+
+    private void drawAlienAnimatedTwo(Graphics2D g2, int x, int y) {
+        g2.setColor(new Color(255, 140, 120));
+        g2.fillRoundRect(x + 2, y + 1, GameModel.ALIEN_WIDTH - 4, GameModel.ALIEN_HEIGHT - 2, 10, 10);
+        g2.setColor(new Color(255, 230, 180));
+        g2.fillRect(x + 5, y + 5, GameModel.ALIEN_WIDTH - 10, 4);
+        g2.fillRect(x + 8, y + 10, GameModel.ALIEN_WIDTH - 16, 3);
+        g2.fillOval(x + 4, y + 2, 6, 6);
+        g2.fillOval(x + GameModel.ALIEN_WIDTH - 10, y + 2, 6, 6);
     }
 
     private void drawUfo(Graphics2D g2) {

@@ -37,6 +37,8 @@ public class GameModel {
     public static final int UFO_Y = 18;
     public static final int UFO_SPEED_X = 10;
 
+    public static final long ANIM_FRAME_TOGGLE_MS = 2000L;
+
     public static final int SHIELD_COUNT = 4;
     public static final int SHIELD_WIDTH = 90;
     public static final int SHIELD_HEIGHT = 30;
@@ -71,6 +73,8 @@ public class GameModel {
     private int ufoSpawnCooldownTicks;
     private Rectangle ufo;
     private int ufoDirectionX;
+    private boolean animFrame;
+    private long lastAnimToggleTimeMs;
     private int destroyedAliens;
     private int recommendedTimerIntervalMs = BASE_TIMER_INTERVAL_MS;
     private int score;
@@ -92,6 +96,8 @@ public class GameModel {
             + UFO_SPAWN_MIN_COOLDOWN;
         ufo = null;
         ufoDirectionX = 1;
+        animFrame = true;
+        lastAnimToggleTimeMs = System.currentTimeMillis();
         destroyedAliens = 0;
         recommendedTimerIntervalMs = BASE_TIMER_INTERVAL_MS;
         score = 0;
@@ -137,6 +143,7 @@ public class GameModel {
 
         moveAliens();
         updateUfo();
+        updateAnimationFrame();
         advancePlayerBullet();
         advanceAlienBullets();
         fireAlienBulletIfReady();
@@ -193,6 +200,10 @@ public class GameModel {
 
     public Rectangle getUfo() {
         return ufo == null ? null : new Rectangle(ufo);
+    }
+
+    public boolean isAnimFrame() {
+        return animFrame;
     }
 
     public int getScore() {
@@ -450,6 +461,14 @@ public class GameModel {
         ufo = null;
         ufoSpawnCooldownTicks = random.nextInt(UFO_SPAWN_MAX_COOLDOWN - UFO_SPAWN_MIN_COOLDOWN + 1)
                 + UFO_SPAWN_MIN_COOLDOWN;
+    }
+
+    private void updateAnimationFrame() {
+        long now = System.currentTimeMillis();
+        while (now - lastAnimToggleTimeMs >= ANIM_FRAME_TOGGLE_MS) {
+            animFrame = !animFrame;
+            lastAnimToggleTimeMs += ANIM_FRAME_TOGGLE_MS;
+        }
     }
 
     private void damageShield(int shieldIndex) {

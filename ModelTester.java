@@ -16,6 +16,7 @@ public class ModelTester {
         testResetRestoresDefaultStartingState();
         testUfoDespawnsAtEdge();
         testUfoCollisionAddsThreeHundredPoints();
+        testAlienAnimationFrameTogglesAfterDelay();
 
         System.out.println();
         System.out.println("Summary: " + passCount + " passed, " + failCount + " failed.");
@@ -220,6 +221,34 @@ public class ModelTester {
         assertCondition("UFO is removed after collision", model.getUfo() == null, "Expected UFO to be removed after collision");
     }
 
+    private static void testAlienAnimationFrameTogglesAfterDelay() {
+        GameModel model = new GameModel();
+        boolean initialFrame = model.isAnimFrame();
+
+        try {
+            setPrivateLongField(
+                    model,
+                    "lastAnimToggleTimeMs",
+                    System.currentTimeMillis() - GameModel.ANIM_FRAME_TOGGLE_MS - 50L
+            );
+        } catch (Exception e) {
+            assertCondition(
+                    "Alien animation frame toggles after delay",
+                    false,
+                    "Unable to adjust animation timing for test"
+            );
+            return;
+        }
+
+        model.tick();
+
+        assertCondition(
+                "Alien animation frame toggles after delay",
+                model.isAnimFrame() != initialFrame,
+                "Expected animFrame to toggle after the animation delay"
+        );
+    }
+
     @SuppressWarnings("unchecked")
     private static void addAlienBulletAtPlayer(GameModel model) throws Exception {
         Field bulletsField = GameModel.class.getDeclaredField("alienBullets");
@@ -239,6 +268,12 @@ public class ModelTester {
         Field field = GameModel.class.getDeclaredField(fieldName);
         field.setAccessible(true);
         field.setInt(model, value);
+    }
+
+    private static void setPrivateLongField(GameModel model, String fieldName, long value) throws Exception {
+        Field field = GameModel.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.setLong(model, value);
     }
 
     private static void setPrivateField(GameModel model, String fieldName, Object value) throws Exception {

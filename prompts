@@ -167,7 +167,7 @@ In ModelTester.java, write boundary tests verifying the UFO despawns safely if i
 
 
 
-results : changes in the 3 files again, the tester passes the 17 test: 
+results : changes in 3 files again, View, Model, and Tester. New methodes were created in the Model : despawnUfo,spawnUfo,updateUfo.  The tester passes the 17 test: 
 "PASS: Player x never goes below zero after repeated left movement
 PASS: Player cannot move past left edge
 PASS: Player cannot move past right edge
@@ -187,4 +187,68 @@ PASS: UFO hit adds 300 points
 PASS: UFO is removed after collision
 
 Summary: 17 passed, 0 failed."
+
+
+
+ [ Alien Formation Animation Debug ]  : 
+Prompt 14 : I need to implement a classic 'Alien Formation Animation' (flicker effect) using strict MVC and TDD.
+
+In GameModel.java, add a boolean field animFrame and a tick counter. Toggle animFrame between true/false every N ticks.
+
+In GameView.java, update the alien rendering logic to draw two distinctly different shapes (or use two different sprites) depending on the state of animFrame.
+
+In ModelTester.java, write a test that simulates N ticks passing and asserts that animFrame successfully toggles its state.
+
+
+results : it actully worked very well , teser: 
+"PASS: Player x never goes below zero after repeated left movement
+PASS: Player cannot move past left edge
+PASS: Player cannot move past right edge
+PASS: Firing while bullet in flight does nothing
+PASS: Player bullet is removed after reaching top
+PASS: Destroying an alien increases score
+PASS: Losing all lives triggers game-over state
+PASS: reset restores score to zero
+PASS: reset restores lives to three
+PASS: reset clears player bullet
+PASS: reset clears alien bullets
+PASS: reset restores aliens
+PASS: reset restores player position
+PASS: reset restores recommended timer interval
+PASS: UFO despawns safely at the opposite edge
+PASS: UFO hit adds 300 points
+PASS: UFO is removed after collision
+PASS: Alien animation frame toggles after N ticks
+
+Summary: 18 passed, 0 failed."
+
+
+ shapes of the enemies changes and they look different every N seonds. But , to learn, I will ask furthur and change more
+
+
+1 follow up prompt 14 : The shapes are not looking good to me, I need in GameView to change the rendering logic drawings and add a third shape, where it picks random between 2nd and 3ed when animFram is true, and picks the normal shape when it is false .  
+
+resulsts : good but, they change too fast, also they increase their changing rate same as their speed when one be destroyed. Not good, they should change their shapes slower, and it should be constant and doesn't get affected like speed. This is, make the N switch of the animeFrame not affected by other methodes or events, and make it slowrs like 2 sec or so. That will be in gameModel, where the logic should be fixed. 
+
+2 FOLLOW UP PROMPT 14  : good but, they change too fast, also they increase their changing rate same as their speed when one be destroyed. Not good, they should change their shapes slower, and it should be constant and doesn't get affected like speed. This is, make the N switch of the animeFrame not affected by other methodes or events, and make it slowrs like 2 sec or so. That will be in gameModel, where the logic should be fixed. 
+
+RESULTS : i SEE another error their, the animeframe is changing every 2 sec, which means when it is true, the blocks (animes) keep picking randomly between the two avalible shapes, which cases them be randomly shaped and keep changing fast between the 2nd and the 3ed. That is wrong, i need them ALL , pick one of the two availbe shapes (2nd or 3ed) and stays on it for the whole 2 sec , then goes it triggurs and goes back to normal , then back to true after another 2 sec and picks again and so on. That is, in GameView lines 67-74, you have to make it not keep looping between the two while the condition is true, make a stopping call or finishing word to make it stable on one of the two random picked choices. 
+
+FOLLOW UP PROMPT 14 : i SEE another error their, the animeframe is changing every 2 sec, which means when it is true, the blocks (animes) keep picking randomly between the two avalible shapes, which cases them be randomly shaped and keep changing fast between the 2nd and the 3ed. That is wrong, i need them ALL , pick one of the two availbe shapes (2nd or 3ed) and stays on it for the whole 2 sec , then goes it triggurs and goes back to normal , then back to true after another 2 sec and picks again and so on. That is, in GameView lines 67-74, you have to make it not keep looping between the two while the condition is true, make a stopping call or finishing word to make it stable on one of the two random picked choices. 
+
+Results : works perfectly , they change slow, they all appear eventually, and everything as expected. 
+
+
+
+
+
+Prompt 15  : I need to add 'Sound Effects' (fire, hit, and death) using javax.sound.sampled.
+CRITICAL ARCHITECTURE RULE: The Model must remain completely ignorant of sounds. Do not import javax.sound into GameModel.java.
+
+Create a simple sound utility class to load and play .wav clips.
+
+In GameController.java, monitor the state of the Model (e.g., bullet fired, score changed, lives lost) and trigger the appropriate sound calls from the Controller.
+
+
+
 
