@@ -13,6 +13,7 @@ public class ModelTester {
         testPlayerBulletRemovedAtTop();
         testDestroyingAlienIncreasesScore();
         testLosingAllLivesTriggersGameOver();
+        testResetRestoresDefaultStartingState();
 
         System.out.println();
         System.out.println("Summary: " + passCount + " passed, " + failCount + " failed.");
@@ -143,6 +144,53 @@ public class ModelTester {
          );
      }
 
+    private static void testResetRestoresDefaultStartingState() throws Exception {
+        GameModel model = new GameModel();
+
+        setPrivateIntField(model, "score", 100);
+        setPrivateIntField(model, "lives", 0);
+        setPrivateIntField(model, "playerX", 0);
+        setPrivateIntField(model, "aliensOriginX", 0);
+        setPrivateIntField(model, "aliensOriginY", 0);
+        setPrivateIntField(model, "destroyedAliens", 12);
+        setPrivateIntField(model, "recommendedTimerIntervalMs", 6);
+        setPrivateField(model, "playerBullet", new GameModel.Bullet(0, 0, 1, 1, 0));
+
+        @SuppressWarnings("unchecked")
+        List<GameModel.Bullet> alienBullets = (List<GameModel.Bullet>) getPrivateField(model, "alienBullets");
+        alienBullets.clear();
+        alienBullets.add(new GameModel.Bullet(0, 0, 1, 1, 0));
+
+        boolean[][] aliens = (boolean[][]) getPrivateField(model, "aliensAlive");
+        for (int row = 0; row < aliens.length; row++) {
+            for (int col = 0; col < aliens[row].length; col++) {
+                aliens[row][col] = false;
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        List<GameModel.Shield> shields = (List<GameModel.Shield>) getPrivateField(model, "shields");
+        shields.clear();
+
+        model.reset();
+
+        GameModel freshModel = new GameModel();
+        boolean aliensRestored = true;
+        for (int row = 0; row < GameModel.ALIEN_ROWS; row++) {
+            for (int col = 0; col < GameModel.ALIEN_COLS; col++) {
+                aliensRestored &= model.isAlienAlive(row, col);
+            }
+        }
+
+        assertCondition("reset restores score to zero", model.getScore() == 0, "Expected score 0 but was " + model.getScore());
+        assertCondition("reset restores lives to three", model.getLives() == 3, "Expected lives 3 but was " + model.getLives());
+        assertCondition("reset clears player bullet", model.getPlayerBullet() == null, "Expected player bullet to be null");
+        assertCondition("reset clears alien bullets", model.getAlienBullets().isEmpty(), "Expected alien bullets list to be empty");
+        assertCondition("reset restores aliens", aliensRestored, "Expected all aliens to be alive again");
+        assertCondition("reset restores player position", model.getPlayerX() == freshModel.getPlayerX(), "Expected player x=" + freshModel.getPlayerX() + " but was x=" + model.getPlayerX());
+        assertCondition("reset restores recommended timer interval", model.getRecommendedTimerInterval() == freshModel.getRecommendedTimerInterval(), "Expected timer interval " + freshModel.getRecommendedTimerInterval() + " but was " + model.getRecommendedTimerInterval());
+    }
+
     @SuppressWarnings("unchecked")
     private static void addAlienBulletAtPlayer(GameModel model) throws Exception {
         Field bulletsField = GameModel.class.getDeclaredField("alienBullets");
@@ -168,6 +216,12 @@ public class ModelTester {
         Field field = GameModel.class.getDeclaredField(fieldName);
         field.setAccessible(true);
         field.set(model, value);
+    }
+
+    private static Object getPrivateField(GameModel model, String fieldName) throws Exception {
+        Field field = GameModel.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return field.get(model);
     }
 
     private static void assertCondition(String testName, boolean condition, String failureDetails) {

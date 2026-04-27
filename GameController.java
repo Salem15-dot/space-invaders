@@ -32,6 +32,7 @@ public class GameController {
         inputMap.put(KeyStroke.getKeyStroke("pressed RIGHT"), "move-right-pressed");
         inputMap.put(KeyStroke.getKeyStroke("released RIGHT"), "move-right-released");
         inputMap.put(KeyStroke.getKeyStroke("pressed SPACE"), "fire");
+        inputMap.put(KeyStroke.getKeyStroke("pressed R"), "reset");
 
         view.getActionMap().put("move-left-pressed", new AbstractAction() {
             @Override
@@ -65,6 +66,15 @@ public class GameController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 model.firePlayerBullet();
+            }
+        });
+
+        view.getActionMap().put("reset", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.reset();
+                gameTimer.setDelay(model.getRecommendedTimerInterval());
+                gameTimer.restart();
             }
         });
     }

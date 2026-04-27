@@ -103,6 +103,69 @@ Summary: 7 passed, 0 failed." worked. Even tho i added this before, it is still 
 
 
 
-Prompt 10 : In the GameModel, add another rules / methods for the collision between the enemies and the player, and make it kill the player directly , that is make it triggers game over. Don't change anything else. 
+Example of debugging : 
+"## Debugging: NullPointerException in checkCollisions
 
-Results : 
+Error received:
+[paste stack trace]
+
+What I understood:
+playerBullet can be null when no bullet is in flight,
+but checkCollisions was calling .intersects() without checking.
+
+Follow-up prompt:
+[paste the prompt you used to fix it]
+
+Result:
+AI added a null guard. Test now passes. Committed."
+
+I had no issues so far, if any I will do that. 
+
+
+Prompt 11 : In the GameModel, add another rules / methods for the collision between the enemies and the player, and make it kill the player directly , that is make it triggers game over. Don't change anything else. 
+
+Results : Works perfectly , then the enemies Touch the player position he dies and gameover. 
+
+
+Prompt 12 : I need to add a 'Restart' feature using the MVC pattern.
+
+In GameModel.java, create a public reset() method. This method must clear all bullets (player and alien), respawn all aliens to their starting positions, reset the player's position, restore lives to 3, and set the current score to 0.
+
+In GameController.java, add a key listener condition so that pressing the 'R' key calls model.reset().
+
+In ModelTester.java, write a test that artificially alters the game state (sets score to 100, removes aliens, kills the player) and then calls reset(). Assert that all values return to their default starting states.
+
+Results : Changes in multiple files, controlar and tester and Model, everything worked. TESTER GAVE : "PASS: Player x never goes below zero after repeated left movement
+PASS: Player cannot move past left edge
+PASS: Player cannot move past right edge
+PASS: Firing while bullet in flight does nothing
+PASS: Player bullet is removed after reaching top
+PASS: Destroying an alien increases score
+PASS: Losing all lives triggers game-over state
+PASS: reset restores score to zero
+PASS: reset restores lives to three
+PASS: reset clears player bullet
+PASS: reset clears alien bullets
+PASS: reset restores aliens
+PASS: reset restores player position
+PASS: reset restores recommended timer interval
+
+Summary: 14 passed, 0 failed." 
+
+
+
+Prompt 13 : I need to add a 'UFO Bonus Ship' using MVC.
+
+In GameModel.java, add a Rectangle (or similar) representing the UFO. Add a timer so it occasionally spawns at the top edge of the screen and moves horizontally across.
+
+Add collision logic: if a player bullet hits the UFO, add 300 points to the score and remove the UFO from the screen.
+
+In GameView.java, add logic to draw the UFO if it is currently active.
+
+In ModelTester.java, write boundary tests verifying the UFO despawns safely if it reaches the opposite edge of the screen without being hit, and a test verifying the 300-point score increase upon collision.
+
+
+
+
+results : changes in the 3 files again, 
+

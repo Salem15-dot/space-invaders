@@ -66,9 +66,20 @@ public class GameModel {
     private int lives;
 
     public GameModel() {
+        reset();
+    }
+
+    public void reset() {
         playerX = (WORLD_WIDTH - PLAYER_WIDTH) / 2;
         aliensOriginX = ALIEN_START_X;
         aliensOriginY = ALIEN_START_Y;
+        aliensDirectionX = 1;
+        playerBullet = null;
+        alienBullets.clear();
+        alienFireCooldownTicks = 0;
+        destroyedAliens = 0;
+        recommendedTimerIntervalMs = BASE_TIMER_INTERVAL_MS;
+        score = 0;
         lives = STARTING_LIVES;
 
         for (int row = 0; row < ALIEN_ROWS; row++) {
@@ -77,6 +88,7 @@ public class GameModel {
             }
         }
 
+        shields.clear();
         for (int index = 0; index < SHIELD_COUNT; index++) {
             int shieldX = SHIELD_START_X + index * (SHIELD_WIDTH + SHIELD_GAP);
             shields.add(new Shield(new Rectangle(shieldX, SHIELD_Y, SHIELD_WIDTH, SHIELD_HEIGHT), 3));
@@ -264,6 +276,7 @@ public class GameModel {
         handlePlayerBulletShieldCollisions();
         handlePlayerBulletAlienCollision();
         handleAlienBulletShieldCollisions();
+        handleAlienPlayerCollisions();
         handleAlienBulletPlayerCollisions();
     }
 
@@ -324,6 +337,29 @@ public class GameModel {
                     alienBullets.clear();
                 }
                 return;
+            }
+        }
+    }
+
+    private void handleAlienPlayerCollisions() {
+        Rectangle playerBounds = new Rectangle(playerX, PLAYER_Y, PLAYER_WIDTH, PLAYER_HEIGHT);
+
+        for (int row = 0; row < ALIEN_ROWS; row++) {
+            for (int col = 0; col < ALIEN_COLS; col++) {
+                if (!aliensAlive[row][col]) {
+                    continue;
+                }
+
+                int alienX = aliensOriginX + col * (ALIEN_WIDTH + ALIEN_H_SPACING);
+                int alienY = aliensOriginY + row * (ALIEN_HEIGHT + ALIEN_V_SPACING);
+                Rectangle alienBounds = new Rectangle(alienX, alienY, ALIEN_WIDTH, ALIEN_HEIGHT);
+
+                if (alienBounds.intersects(playerBounds)) {
+                    lives = 0;
+                    playerBullet = null;
+                    alienBullets.clear();
+                    return;
+                }
             }
         }
     }
