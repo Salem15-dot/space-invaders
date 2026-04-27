@@ -8,8 +8,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 public class GameController {
-    private static final int TICK_MS = 16;
-
     private final GameModel model;
     private final GameView view;
     private final Timer gameTimer;
@@ -22,7 +20,7 @@ public class GameController {
         this.view = view;
 
         configureInput();
-        gameTimer = new Timer(TICK_MS, this::onTick);
+        gameTimer = new Timer(model.getRecommendedTimerInterval(), this::onTick);
         gameTimer.start();
     }
 
@@ -80,6 +78,7 @@ public class GameController {
 
         model.tick();
         view.repaint();
+        gameTimer.setDelay(model.getRecommendedTimerInterval());
 
         if (model.getLives() <= 0) {
             gameTimer.stop();

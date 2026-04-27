@@ -63,10 +63,46 @@ results : Works and can be seen! really good, code run, nothing else in other fi
 prompt 8: In GameModel.java, increase the alien movement speed each time an alien is destroyed. Expose a method the Controller can call to get the current recommended timer interval. Do not touch the View.
 
 
+results : worked good, the enemies now go faster after killing one of them. There is a new method caller for the timer interval , other files were not touched . 
+
+
+
+
+
+Prompt 9 : in ModelTester2 , i have used few methodes names that am not sure what you have called them in the main GameModel file , read carfully and search and understand, then fix the names accordengly. No other edits are needed if not requiered to make this work, no other changes. 
+
+
+results: worked good, fixed the names , added few other methodes i didn't add , and added more detailed naming for the failur or succed method testing.  : 
+"PASS: player starts with 3 lives
+PASS: score starts at zero
+PASS: no bullet at start
+PASS: game is not over at start
+PASS: moving right increases x
+PASS: player x never goes below 0
+PASS: firing creates a bullet
+PASS: cannot fire a second bullet
+PASS: destroying an alien increases score
+PASS: losing all lives triggers game over
+
+10 passed, 0 failed." 
+
+
+Prompt 10 : "Looking at GameModel.java, add a static test method to ModelTester.java called testPlayerBoundary. It should call the player's left-movement method two hundred times and use the check helper to verify the player's x position never goes below zero. Hook it into main."
+
 results : 
+"PASS: Player x never goes below zero after repeated left movement
+PASS: Player cannot move past left edge
+PASS: Player cannot move past right edge
+PASS: Firing while bullet in flight does nothing
+PASS: Player bullet is removed after reaching top
+PASS: Destroying an alien increases score
+PASS: Losing all lives triggers game-over state
+
+Summary: 7 passed, 0 failed." worked. Even tho i added this before, it is still helpfull to do it twice in two different ways to learn more. 
 
 
 
-Prompt 9 : In the GameModel, add another rules / methods for the collision between the enemies and the player, and make it kill the player directly ( make his lives 0 and stop the timer and restart the game after 1 second ). Don't change anything else. 
+
+Prompt 10 : In the GameModel, add another rules / methods for the collision between the enemies and the player, and make it kill the player directly , that is make it triggers game over. Don't change anything else. 
 
 Results : 

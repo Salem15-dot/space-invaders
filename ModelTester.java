@@ -6,6 +6,7 @@ public class ModelTester {
     private static int failCount;
 
     public static void main(String[] args) throws Exception {
+        testPlayerBoundary();
         testPlayerCannotMovePastLeftEdge();
         testPlayerCannotMovePastRightEdge();
         testCannotFireSecondBulletWhileFirstInFlight();
@@ -28,6 +29,20 @@ public class ModelTester {
                 "Player cannot move past left edge",
                 model.getPlayerX() == 0,
                 "Expected x=0 but was x=" + model.getPlayerX()
+        );
+    }
+
+    private static void testPlayerBoundary() {
+        GameModel model = new GameModel();
+
+        for (int i = 0; i < 200; i++) {
+            model.movePlayerLeft();
+        }
+
+        assertCondition(
+                "Player x never goes below zero after repeated left movement",
+                model.getPlayerX() >= 0,
+                "Expected x to stay at or above 0 but was x=" + model.getPlayerX()
         );
     }
 

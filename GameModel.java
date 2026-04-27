@@ -32,21 +32,25 @@ public class GameModel {
     public static final int ALIEN_BULLET_HEIGHT = 10;
     public static final int ALIEN_BULLET_SPEED = 8;
 
-        public static final int SHIELD_COUNT = 4;
-        public static final int SHIELD_WIDTH = 90;
-        public static final int SHIELD_HEIGHT = 30;
-        public static final int SHIELD_GAP = 60;
-        public static final int SHIELD_Y = PLAYER_Y - 120;
+    public static final int SHIELD_COUNT = 4;
+    public static final int SHIELD_WIDTH = 90;
+    public static final int SHIELD_HEIGHT = 30;
+    public static final int SHIELD_GAP = 60;
+    public static final int SHIELD_Y = PLAYER_Y - 120;
+
+    private static final int BASE_TIMER_INTERVAL_MS = 16;
+    private static final int MIN_TIMER_INTERVAL_MS = 6;
+    private static final int TIMER_INTERVAL_STEP_MS = 1;
 
     private static final int STARTING_LIVES = 3;
     private static final int ALIEN_FIRE_MIN_COOLDOWN = 15;
     private static final int ALIEN_FIRE_MAX_COOLDOWN = 55;
     private static final int SCORE_PER_ALIEN = 10;
-        private static final int SHIELD_START_X = (WORLD_WIDTH - (SHIELD_COUNT * SHIELD_WIDTH
+    private static final int SHIELD_START_X = (WORLD_WIDTH - (SHIELD_COUNT * SHIELD_WIDTH
             + (SHIELD_COUNT - 1) * SHIELD_GAP)) / 2;
 
     private final boolean[][] aliensAlive = new boolean[ALIEN_ROWS][ALIEN_COLS];
-        private final List<Shield> shields = new ArrayList<>();
+    private final List<Shield> shields = new ArrayList<>();
     private final List<Bullet> alienBullets = new ArrayList<>();
     private final Random random = new Random();
 
@@ -56,6 +60,8 @@ public class GameModel {
     private int aliensDirectionX = 1;
     private Bullet playerBullet;
     private int alienFireCooldownTicks;
+    private int destroyedAliens;
+    private int recommendedTimerIntervalMs = BASE_TIMER_INTERVAL_MS;
     private int score;
     private int lives;
 
@@ -163,6 +169,10 @@ public class GameModel {
 
     public int getLives() {
         return lives;
+    }
+
+    public int getRecommendedTimerInterval() {
+        return recommendedTimerIntervalMs;
     }
 
     public boolean isGameOver() {
@@ -291,6 +301,7 @@ public class GameModel {
                     aliensAlive[row][col] = false;
                     playerBullet = null;
                     score += SCORE_PER_ALIEN;
+                    registerAlienDestroyed();
                     return;
                 }
             }
@@ -380,6 +391,14 @@ public class GameModel {
     private void resetAlienFireCooldown() {
         alienFireCooldownTicks = ALIEN_FIRE_MIN_COOLDOWN
                 + random.nextInt(ALIEN_FIRE_MAX_COOLDOWN - ALIEN_FIRE_MIN_COOLDOWN + 1);
+    }
+
+    private void registerAlienDestroyed() {
+        destroyedAliens++;
+        recommendedTimerIntervalMs = Math.max(
+                MIN_TIMER_INTERVAL_MS,
+                BASE_TIMER_INTERVAL_MS - destroyedAliens * TIMER_INTERVAL_STEP_MS
+        );
     }
 
     private boolean intersects(Bullet bullet, int x, int y, int width, int height) {
