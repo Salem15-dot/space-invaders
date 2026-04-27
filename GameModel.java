@@ -138,6 +138,10 @@ public class GameModel {
         return lives;
     }
 
+    public boolean isGameOver() {
+        return lives <= 0;
+    }
+
     private void moveAliens() {
         if (!anyAliensAlive()) {
             return;

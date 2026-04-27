@@ -23,4 +23,22 @@ Prompt 4 : Fill in GameController.java. Add keyboard controls so the player can 
 results : Best prompt so far, made a really good movments and controling. I liked it so much, the run went very well, no issues and the codes are as needed. GameController only was changed and added the needed codes to do what it was asked for. 
 
 
-Prompt5: 
+Prompt5: Create a separate file called ModelTester.java with a main method. It should create a GameModel, call its methods directly, and print PASS or FAIL for each check. Write tests for at least five behaviors: the player cannot move past the left or right edge, firing while a bullet is already in flight does nothing, a bullet that reaches the top is removed, destroying an alien increases the score, and losing all lives triggers the game-over state. No testing libraries — just plain Java.
+
+
+results : A new file called ModelTester.java was created. To test the logic without opening a window and so, the results is good : 
+"PASS: Player cannot move past left edge
+PASS: Player cannot move past right edge
+PASS: Firing while bullet in flight does nothing
+PASS: Player bullet is removed after reaching top
+PASS: Destroying an alien increases score
+PASS: Losing all lives triggers game-over state
+
+Summary: 6 passed, 0 failed."
+
+
+
+
+
+
+Note: after reading and looking carfully, i understood that these .class files are created everytime i run the codes / compile or so i guess. They are not real files, just temporary files that we created from compiling the .java codes files. I think
