@@ -6,3 +6,11 @@ I'm building Space Invaders in Java using Swing, split into three files: GameMod
 result 1 : it created the 3 files and compiled them which created another 3 files that have same name but .class extension. Everything eles works and correct as needed. 
 
 
+Prompt 2 : Fill in GameModel.java. The model should track: the player's horizontal position, the alien formation (5 rows of 11), the player's bullet (one at a time), alien bullets, the score, and lives remaining (start with 3). Add logic to: move the player left and right, fire a player bullet if one isn't already in flight, advance the player's bullet each tick, move the alien formation right until the edge then down and reverse, fire alien bullets at random intervals, and detect collisions between bullets and aliens or the player. No Swing imports.
+
+
+
+results : it added more codes to the file GameModel.java, and created a new .class file named GameModel$Bullet.class . The window that opens still blank and nothing else happining. 
+
+
+Prompt 3 : 
