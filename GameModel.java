@@ -1,3 +1,4 @@
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,12 +32,21 @@ public class GameModel {
     public static final int ALIEN_BULLET_HEIGHT = 10;
     public static final int ALIEN_BULLET_SPEED = 8;
 
+        public static final int SHIELD_COUNT = 4;
+        public static final int SHIELD_WIDTH = 90;
+        public static final int SHIELD_HEIGHT = 30;
+        public static final int SHIELD_GAP = 60;
+        public static final int SHIELD_Y = PLAYER_Y - 120;
+
     private static final int STARTING_LIVES = 3;
     private static final int ALIEN_FIRE_MIN_COOLDOWN = 15;
     private static final int ALIEN_FIRE_MAX_COOLDOWN = 55;
     private static final int SCORE_PER_ALIEN = 10;
+        private static final int SHIELD_START_X = (WORLD_WIDTH - (SHIELD_COUNT * SHIELD_WIDTH
+            + (SHIELD_COUNT - 1) * SHIELD_GAP)) / 2;
 
     private final boolean[][] aliensAlive = new boolean[ALIEN_ROWS][ALIEN_COLS];
+        private final List<Shield> shields = new ArrayList<>();
     private final List<Bullet> alienBullets = new ArrayList<>();
     private final Random random = new Random();
 
@@ -59,6 +69,11 @@ public class GameModel {
             for (int col = 0; col < ALIEN_COLS; col++) {
                 aliensAlive[row][col] = true;
             }
+        }
+
+        for (int index = 0; index < SHIELD_COUNT; index++) {
+            int shieldX = SHIELD_START_X + index * (SHIELD_WIDTH + SHIELD_GAP);
+            shields.add(new Shield(new Rectangle(shieldX, SHIELD_Y, SHIELD_WIDTH, SHIELD_HEIGHT), 3));
         }
 
         resetAlienFireCooldown();
@@ -128,6 +143,18 @@ public class GameModel {
 
     public List<Bullet> getAlienBullets() {
         return Collections.unmodifiableList(alienBullets);
+    }
+
+    public List<Rectangle> getShieldRectangles() {
+        List<Rectangle> copy = new ArrayList<>();
+        for (Shield shield : shields) {
+            copy.add(new Rectangle(shield.bounds));
+        }
+        return Collections.unmodifiableList(copy);
+    }
+
+    public List<Shield> getShields() {
+        return Collections.unmodifiableList(shields);
     }
 
     public int getScore() {
@@ -224,8 +251,27 @@ public class GameModel {
     }
 
     private void detectCollisions() {
+        handlePlayerBulletShieldCollisions();
         handlePlayerBulletAlienCollision();
+        handleAlienBulletShieldCollisions();
         handleAlienBulletPlayerCollisions();
+    }
+
+    private void handlePlayerBulletShieldCollisions() {
+        if (playerBullet == null) {
+            return;
+        }
+
+        for (int index = shields.size() - 1; index >= 0; index--) {
+            Shield shield = shields.get(index);
+            if (!intersects(playerBullet, shield.bounds.x, shield.bounds.y, shield.bounds.width, shield.bounds.height)) {
+                continue;
+            }
+
+            damageShield(index);
+            playerBullet = null;
+            return;
+        }
     }
 
     private void handlePlayerBulletAlienCollision() {
@@ -268,6 +314,37 @@ public class GameModel {
                 }
                 return;
             }
+        }
+    }
+
+    private void handleAlienBulletShieldCollisions() {
+        for (int bulletIndex = alienBullets.size() - 1; bulletIndex >= 0; bulletIndex--) {
+            Bullet bullet = alienBullets.get(bulletIndex);
+
+            boolean bulletConsumed = false;
+            for (int shieldIndex = shields.size() - 1; shieldIndex >= 0; shieldIndex--) {
+                Shield shield = shields.get(shieldIndex);
+                if (!intersects(bullet, shield.bounds.x, shield.bounds.y, shield.bounds.width, shield.bounds.height)) {
+                    continue;
+                }
+
+                damageShield(shieldIndex);
+                alienBullets.remove(bulletIndex);
+                bulletConsumed = true;
+                break;
+            }
+
+            if (bulletConsumed) {
+                continue;
+            }
+        }
+    }
+
+    private void damageShield(int shieldIndex) {
+        Shield shield = shields.get(shieldIndex);
+        shield.health--;
+        if (shield.health <= 0) {
+            shields.remove(shieldIndex);
         }
     }
 
@@ -350,6 +427,24 @@ public class GameModel {
 
         public int getVy() {
             return vy;
+        }
+    }
+
+    public static class Shield {
+        private final Rectangle bounds;
+        private int health;
+
+        public Shield(Rectangle bounds, int health) {
+            this.bounds = bounds;
+            this.health = health;
+        }
+
+        public Rectangle getBounds() {
+            return new Rectangle(bounds);
+        }
+
+        public int getHealth() {
+            return health;
         }
     }
 }

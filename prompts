@@ -42,3 +42,31 @@ Summary: 6 passed, 0 failed."
 
 
 Note: after reading and looking carfully, i understood that these .class files are created everytime i run the codes / compile or so i guess. They are not real files, just temporary files that we created from compiling the .java codes files. I think
+
+
+
+Prompt 6 : In GameModel.java, add a list of shield rectangles positioned between the player and the alien formation. Reduce a shield's health when hit by a bullet from either side. Remove the shield when health reaches zero. No Swing imports.
+
+
+results : changes in gamemodel file and added a shield but it doesn't appear! So it is there but i can't see it, it is clear it is there becouse the bullets hits something and disappear in the air, so i assumed it is the sheids that AI added but forgot to make some appearance for it. Works and other files were not touched .  I will give it another enhancments prompt 
+
+
+Prompt 7: The shield that was added works, but has no appearance, In GameView.java's paintComponent method only, draw the shields from the model's shield list. Use the shield's health value to choose a color from full green to dim red. Do not call any model mutating methods.
+
+
+
+results : Works and can be seen! really good, code run, nothing else in other files was changed. 
+
+
+
+
+prompt 8: In GameModel.java, increase the alien movement speed each time an alien is destroyed. Expose a method the Controller can call to get the current recommended timer interval. Do not touch the View.
+
+
+results : 
+
+
+
+Prompt 9 : In the GameModel, add another rules / methods for the collision between the enemies and the player, and make it kill the player directly ( make his lives 0 and stop the timer and restart the game after 1 second ). Don't change anything else. 
+
+Results : 

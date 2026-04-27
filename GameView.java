@@ -24,6 +24,15 @@ public class GameView extends JPanel {
 
         drawPlayer(g2);
         drawAliens(g2);
+        for (GameModel.Shield shield : model.getShields()) {
+            java.awt.Rectangle bounds = shield.getBounds();
+            double healthRatio = Math.max(0.0, Math.min(1.0, shield.getHealth() / 3.0));
+            int red = (int) Math.round(140 * (1.0 - healthRatio));
+            int green = (int) Math.round(255 * healthRatio);
+            int blue = (int) Math.round(40 * (1.0 - healthRatio));
+            g2.setColor(new Color(red, green, blue));
+            g2.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+        }
         drawBullets(g2);
         drawHud(g2);
         drawGameOver(g2);
