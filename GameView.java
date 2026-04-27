@@ -41,6 +41,7 @@ public class GameView extends JPanel {
         drawUfo(g2);
         drawBullets(g2);
         drawHud(g2);
+        drawVictoryOverlay(g2);
         drawGameOver(g2);
     }
 
@@ -150,7 +151,36 @@ public class GameView extends JPanel {
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("SansSerif", Font.BOLD, 18));
         g2.drawString("Score: " + model.getScore(), 16, 28);
+        g2.drawString("Level: " + model.getLevel(), 350, 28);
         g2.drawString("Lives: " + model.getLives(), GameModel.WORLD_WIDTH - 100, 28);
+    }
+
+    private void drawVictoryOverlay(Graphics2D g2) {
+        if (!model.isVictoryTransitionActive() || model.isGameOver()) {
+            return;
+        }
+
+        int levelComplete = Math.max(1, model.getLevel());
+        int nextLevel = levelComplete + 1;
+        String title = "LEVEL " + levelComplete + " CLEAR";
+        String subtitle = "Next Level " + nextLevel + " in " + model.getVictoryCountdownSeconds() + "...";
+
+        g2.setColor(new Color(0, 0, 0, 150));
+        g2.fillRect(0, 0, getWidth(), getHeight());
+
+        g2.setColor(new Color(255, 245, 140));
+        g2.setFont(new Font("SansSerif", Font.BOLD, 52));
+        FontMetrics titleMetrics = g2.getFontMetrics();
+        int titleX = (getWidth() - titleMetrics.stringWidth(title)) / 2;
+        int titleY = getHeight() / 2 - 20;
+        g2.drawString(title, titleX, titleY);
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("SansSerif", Font.PLAIN, 24));
+        FontMetrics subtitleMetrics = g2.getFontMetrics();
+        int subtitleX = (getWidth() - subtitleMetrics.stringWidth(subtitle)) / 2;
+        int subtitleY = titleY + 46;
+        g2.drawString(subtitle, subtitleX, subtitleY);
     }
 
     private void drawGameOver(Graphics2D g2) {

@@ -182,7 +182,7 @@ public class ModelTester {
         boolean aliensRestored = true;
         for (int row = 0; row < GameModel.ALIEN_ROWS; row++) {
             for (int col = 0; col < GameModel.ALIEN_COLS; col++) {
-                aliensRestored &= model.isAlienAlive(row, col);
+                aliensRestored &= model.isAlienAlive(row, col) == freshModel.isAlienAlive(row, col);
             }
         }
 
@@ -190,7 +190,7 @@ public class ModelTester {
         assertCondition("reset restores lives to three", model.getLives() == 3, "Expected lives 3 but was " + model.getLives());
         assertCondition("reset clears player bullet", model.getPlayerBullet() == null, "Expected player bullet to be null");
         assertCondition("reset clears alien bullets", model.getAlienBullets().isEmpty(), "Expected alien bullets list to be empty");
-        assertCondition("reset restores aliens", aliensRestored, "Expected all aliens to be alive again");
+        assertCondition("reset restores aliens", aliensRestored, "Expected alien layout to match level 1 defaults");
         assertCondition("reset restores player position", model.getPlayerX() == freshModel.getPlayerX(), "Expected player x=" + freshModel.getPlayerX() + " but was x=" + model.getPlayerX());
         assertCondition("reset restores recommended timer interval", model.getRecommendedTimerInterval() == freshModel.getRecommendedTimerInterval(), "Expected timer interval " + freshModel.getRecommendedTimerInterval() + " but was " + model.getRecommendedTimerInterval());
     }

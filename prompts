@@ -254,11 +254,70 @@ In GameController.java, monitor the state of the Model (e.g., bullet fired, scor
 results : No sounds, This comes from the fact that no files were added to  .wav files at sounds/fire.wav, sounds/hit.wav, and sounds/death.wav so playback occurs at runtime . So do so, search and creat sounds if that is something you as AI can do, if not let me know how to do it myself. 
 
 
-FOLLOW UP PROMPT : No sounds, This comes from the fact that no files were added to  .wav files at sounds/fire.wav, sounds/hit.wav, and sounds/death.wav so playback occurs at runtime . So do so, search and creat sounds if that is something you as AI can do, if not let me know how to do it myself. 
+FOLLOW UP PROMPT 15 : No sounds, This comes from the fact that no files were added to  .wav files at sounds/fire.wav, sounds/hit.wav, and sounds/death.wav so playback occurs at runtime . So do so, search and creat sounds if that is something you as AI can do, if not let me know how to do it myself. 
 
 results : Now that works !
 
 FOllOW UP PRMOPT 13 : The bounc goes very fast i can't catch it, also it goes one time and doesn't repeat or maybe repeat but so slow that the game time is not enough for more than one. Read the files and functions for this one specially in 3 files again, View, Model, and Tester. The methodes that were created in the Model : despawnUfo,spawnUfo,updateUfo. Also it comes alawys same place at the top of the screen from right to left, which all are not what it should do. It should come from randome places, left to right or right to left, at any y position within the game desply borders, that is eather very top or even close to the player, but not within few y units above him , and never beyound the highest y in the screen or lowest y. and gives randome points not only 300, between 150-300. 
 
 
-Results : tester works, also when running the code the bounce works as descriped, very well . 
+Results : tester works, also when running the code the bounce works as descriped, very well . tester : "
+PASS: Player x never goes below zero after repeated left movement
+PASS: Player cannot move past left edge
+PASS: Player cannot move past right edge
+PASS: Firing while bullet in flight does nothing
+PASS: Player bullet is removed after reaching top
+PASS: Destroying an alien increases score
+PASS: Losing all lives triggers game-over state
+PASS: reset restores score to zero
+PASS: reset restores lives to three
+PASS: reset clears player bullet
+PASS: reset clears alien bullets
+PASS: reset restores aliens
+PASS: reset restores player position
+PASS: reset restores recommended timer interval
+PASS: UFO despawns safely at the opposite edge
+PASS: UFO spawns from a valid side
+PASS: UFO spawns within valid Y range
+PASS: UFO hit adds random bonus points (150-300)
+PASS: UFO is removed after collision
+PASS: Alien animation frame toggles after delay
+
+Summary: 20 passed, 0 failed." 
+
+
+
+Prompt 16 : The game is too hard, almost impossible to win, make the animes starts with one row, make this level 1, then when killing them all make a win / vectory window that loads for 3 sec then starts the next level 2, which is 2 rows, and so on. These edits should be in GameModel, where the new methodes and functions should be built and dealed with, make sure everything else still works the same and no changes . In gameview maybe needs to build the vectory / win window drawings and loadings, make sure everything else works same and looks good. 
+
+
+ results/ follow up prompt 16 : I can't even test it becouse i keep dying, they get so fast, make the speed don't go beyond a certin limit which is fast but not that fast, like slower than that. 
+
+
+results : It is hard but fun, i made it to level 2, and tester works : 
+"PASS: Player x never goes below zero after repeated left movement
+PASS: Player cannot move past left edge
+PASS: Player cannot move past right edge
+PASS: Firing while bullet in flight does nothing
+PASS: Player bullet is removed after reaching top
+PASS: Destroying an alien increases score
+PASS: Losing all lives triggers game-over state
+PASS: reset restores score to zero
+PASS: reset restores lives to three
+PASS: reset clears player bullet
+PASS: reset clears alien bullets
+PASS: reset restores aliens
+PASS: reset restores player position
+PASS: reset restores recommended timer interval
+PASS: UFO despawns safely at the opposite edge
+PASS: UFO spawns from a valid side
+PASS: UFO spawns within valid Y range
+PASS: UFO hit adds random bonus points (150-300)
+PASS: UFO is removed after collision
+PASS: Alien animation frame toggles after delay
+
+Summary: 20 passed, 0 failed." 
+
+
+Maybe more improvment could be done for the speed and range of the bullet . 
+
+

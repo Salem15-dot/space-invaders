@@ -40,6 +40,7 @@ public class GameModel {
     public static final int UFO_SPEED_X = 3;
 
     public static final long ANIM_FRAME_TOGGLE_MS = 2000L;
+    public static final long LEVEL_VICTORY_DISPLAY_MS = 3000L;
 
     public static final int SHIELD_COUNT = 4;
     public static final int SHIELD_WIDTH = 90;
@@ -48,7 +49,7 @@ public class GameModel {
     public static final int SHIELD_Y = PLAYER_Y - 120;
 
     private static final int BASE_TIMER_INTERVAL_MS = 16;
-    private static final int MIN_TIMER_INTERVAL_MS = 6;
+    private static final int MIN_TIMER_INTERVAL_MS = 10;
     private static final int TIMER_INTERVAL_STEP_MS = 1;
 
     private static final int STARTING_LIVES = 3;
@@ -80,12 +81,53 @@ public class GameModel {
     private int recommendedTimerIntervalMs = BASE_TIMER_INTERVAL_MS;
     private int score;
     private int lives;
+    private int level;
+    private boolean victoryTransitionActive;
+    private long victoryTransitionEndTimeMs;
 
     public GameModel() {
         reset();
     }
 
     public void reset() {
+        level = 1;
+        score = 0;
+        lives = STARTING_LIVES;
+        victoryTransitionActive = false;
+        victoryTransitionEndTimeMs = 0L;
+
+        setupCurrentLevelState();
+
+        animFrame = true;
+        lastAnimToggleTimeMs = System.currentTimeMillis();
+    }
+
+    public void tick() {
+        if (lives <= 0) {
+            return;
+        }
+
+        updateAnimationFrame();
+
+        if (victoryTransitionActive) {
+            if (System.currentTimeMillis() >= victoryTransitionEndTimeMs) {
+                level++;
+                victoryTransitionActive = false;
+                victoryTransitionEndTimeMs = 0L;
+                setupCurrentLevelState();
+            }
+            return;
+        }
+
+        moveAliens();
+        updateUfo();
+        advancePlayerBullet();
+        advanceAlienBullets();
+        fireAlienBulletIfReady();
+        detectCollisions();
+    }
+
+    private void setupCurrentLevelState() {
         playerX = (WORLD_WIDTH - PLAYER_WIDTH) / 2;
         aliensOriginX = ALIEN_START_X;
         aliensOriginY = ALIEN_START_Y;
@@ -96,16 +138,13 @@ public class GameModel {
         resetUfoSpawnCooldown();
         ufo = null;
         ufoDirectionX = 1;
-        animFrame = true;
-        lastAnimToggleTimeMs = System.currentTimeMillis();
         destroyedAliens = 0;
         recommendedTimerIntervalMs = BASE_TIMER_INTERVAL_MS;
-        score = 0;
-        lives = STARTING_LIVES;
 
+        int activeRows = Math.min(level, ALIEN_ROWS);
         for (int row = 0; row < ALIEN_ROWS; row++) {
             for (int col = 0; col < ALIEN_COLS; col++) {
-                aliensAlive[row][col] = true;
+                aliensAlive[row][col] = row < activeRows;
             }
         }
 
@@ -134,20 +173,6 @@ public class GameModel {
         int bulletX = playerX + (PLAYER_WIDTH - PLAYER_BULLET_WIDTH) / 2;
         int bulletY = PLAYER_Y - PLAYER_BULLET_HEIGHT;
         playerBullet = new Bullet(bulletX, bulletY, PLAYER_BULLET_WIDTH, PLAYER_BULLET_HEIGHT, -PLAYER_BULLET_SPEED);
-    }
-
-    public void tick() {
-        if (lives <= 0) {
-            return;
-        }
-
-        moveAliens();
-        updateUfo();
-        updateAnimationFrame();
-        advancePlayerBullet();
-        advanceAlienBullets();
-        fireAlienBulletIfReady();
-        detectCollisions();
     }
 
     public int getPlayerX() {
@@ -212,6 +237,23 @@ public class GameModel {
 
     public int getLives() {
         return lives;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public boolean isVictoryTransitionActive() {
+        return victoryTransitionActive;
+    }
+
+    public int getVictoryCountdownSeconds() {
+        if (!victoryTransitionActive) {
+            return 0;
+        }
+
+        long remainingMs = Math.max(0L, victoryTransitionEndTimeMs - System.currentTimeMillis());
+        return (int) Math.ceil(remainingMs / 1000.0);
     }
 
     public int getRecommendedTimerInterval() {
@@ -347,6 +389,9 @@ public class GameModel {
                     playerBullet = null;
                     score += SCORE_PER_ALIEN;
                     registerAlienDestroyed();
+                    if (!anyAliensAlive()) {
+                        startVictoryTransition();
+                    }
                     return;
                 }
             }
@@ -478,6 +523,14 @@ public class GameModel {
             animFrame = !animFrame;
             lastAnimToggleTimeMs += ANIM_FRAME_TOGGLE_MS;
         }
+    }
+
+    private void startVictoryTransition() {
+        victoryTransitionActive = true;
+        victoryTransitionEndTimeMs = System.currentTimeMillis() + LEVEL_VICTORY_DISPLAY_MS;
+        playerBullet = null;
+        alienBullets.clear();
+        ufo = null;
     }
 
     private void damageShield(int shieldIndex) {
