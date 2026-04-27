@@ -13,4 +13,14 @@ Prompt 2 : Fill in GameModel.java. The model should track: the player's horizont
 results : it added more codes to the file GameModel.java, and created a new .class file named GameModel$Bullet.class . The window that opens still blank and nothing else happining. 
 
 
-Prompt 3 : 
+Prompt 3 : Fill in GameView.java. It should take a reference to the model and draw everything the player sees: the player, the alien formation, both sets of bullets, the score, and remaining lives. Show a centered game-over message when the game ends. The view should only read from the model — it must never change game state.
+
+results : It was actully really good, i checked the GameView.java file and no methods of controling or so ( SetScore, MoveBullet, etc..) where found. It is all drawing and visualizing. I run the code, it opens a window with good looking game and drawings. Nothing moves or work yet. 
+
+
+Prompt 4 : Fill in GameController.java. Add keyboard controls so the player can move left and right with the arrow keys and fire with the spacebar. Add a game loop using a Swing timer that updates the model each tick and redraws the view. Stop the loop when the game is over.
+
+results : Best prompt so far, made a really good movments and controling. I liked it so much, the run went very well, no issues and the codes are as needed. GameController only was changed and added the needed codes to do what it was asked for. 
+
+
+Prompt5: 

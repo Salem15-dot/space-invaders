@@ -1,20 +1,95 @@
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
+import javax.swing.InputMap;
 import javax.swing.JFrame;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 public class GameController {
+    private static final int TICK_MS = 16;
+
     private final GameModel model;
     private final GameView view;
+    private final Timer gameTimer;
 
-    // TODO: Coordinate input, game loop updates, and communication between model and view.
+    private boolean movingLeft;
+    private boolean movingRight;
+
     public GameController(GameModel model, GameView view) {
         this.model = model;
         this.view = view;
+
+        configureInput();
+        gameTimer = new Timer(TICK_MS, this::onTick);
+        gameTimer.start();
+    }
+
+    private void configureInput() {
+        InputMap inputMap = view.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        inputMap.put(KeyStroke.getKeyStroke("pressed LEFT"), "move-left-pressed");
+        inputMap.put(KeyStroke.getKeyStroke("released LEFT"), "move-left-released");
+        inputMap.put(KeyStroke.getKeyStroke("pressed RIGHT"), "move-right-pressed");
+        inputMap.put(KeyStroke.getKeyStroke("released RIGHT"), "move-right-released");
+        inputMap.put(KeyStroke.getKeyStroke("pressed SPACE"), "fire");
+
+        view.getActionMap().put("move-left-pressed", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                movingLeft = true;
+            }
+        });
+
+        view.getActionMap().put("move-left-released", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                movingLeft = false;
+            }
+        });
+
+        view.getActionMap().put("move-right-pressed", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                movingRight = true;
+            }
+        });
+
+        view.getActionMap().put("move-right-released", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                movingRight = false;
+            }
+        });
+
+        view.getActionMap().put("fire", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.firePlayerBullet();
+            }
+        });
+    }
+
+    private void onTick(ActionEvent e) {
+        if (movingLeft && !movingRight) {
+            model.movePlayerLeft();
+        } else if (movingRight && !movingLeft) {
+            model.movePlayerRight();
+        }
+
+        model.tick();
+        view.repaint();
+
+        if (model.getLives() <= 0) {
+            gameTimer.stop();
+        }
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             GameModel model = new GameModel();
-            GameView view = new GameView();
+            GameView view = new GameView(model);
             new GameController(model, view);
 
             JFrame frame = new JFrame("Space Invaders");
