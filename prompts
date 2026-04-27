@@ -251,4 +251,14 @@ In GameController.java, monitor the state of the Model (e.g., bullet fired, scor
 
 
 
+results : No sounds, This comes from the fact that no files were added to  .wav files at sounds/fire.wav, sounds/hit.wav, and sounds/death.wav so playback occurs at runtime . So do so, search and creat sounds if that is something you as AI can do, if not let me know how to do it myself. 
 
+
+FOLLOW UP PROMPT : No sounds, This comes from the fact that no files were added to  .wav files at sounds/fire.wav, sounds/hit.wav, and sounds/death.wav so playback occurs at runtime . So do so, search and creat sounds if that is something you as AI can do, if not let me know how to do it myself. 
+
+results : Now that works !
+
+FOllOW UP PRMOPT 13 : The bounc goes very fast i can't catch it, also it goes one time and doesn't repeat or maybe repeat but so slow that the game time is not enough for more than one. Read the files and functions for this one specially in 3 files again, View, Model, and Tester. The methodes that were created in the Model : despawnUfo,spawnUfo,updateUfo. Also it comes alawys same place at the top of the screen from right to left, which all are not what it should do. It should come from randome places, left to right or right to left, at any y position within the game desply borders, that is eather very top or even close to the player, but not within few y units above him , and never beyound the highest y in the screen or lowest y. and gives randome points not only 300, between 150-300. 
+
+
+Results : tester works, also when running the code the bounce works as descriped, very well . 

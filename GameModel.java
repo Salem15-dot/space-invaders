@@ -34,8 +34,10 @@ public class GameModel {
 
     public static final int UFO_WIDTH = 48;
     public static final int UFO_HEIGHT = 22;
-    public static final int UFO_Y = 18;
-    public static final int UFO_SPEED_X = 10;
+    public static final int UFO_MIN_BONUS_POINTS = 150;
+    public static final int UFO_MAX_BONUS_POINTS = 300;
+    public static final int UFO_SAFE_PLAYER_GAP_Y = 60;
+    public static final int UFO_SPEED_X = 3;
 
     public static final long ANIM_FRAME_TOGGLE_MS = 2000L;
 
@@ -53,9 +55,8 @@ public class GameModel {
     private static final int ALIEN_FIRE_MIN_COOLDOWN = 15;
     private static final int ALIEN_FIRE_MAX_COOLDOWN = 55;
     private static final int SCORE_PER_ALIEN = 10;
-    private static final int SCORE_PER_UFO = 300;
-    private static final int UFO_SPAWN_MIN_COOLDOWN = 240;
-    private static final int UFO_SPAWN_MAX_COOLDOWN = 480;
+    private static final int UFO_SPAWN_MIN_COOLDOWN = 60;
+    private static final int UFO_SPAWN_MAX_COOLDOWN = 180;
     private static final int SHIELD_START_X = (WORLD_WIDTH - (SHIELD_COUNT * SHIELD_WIDTH
             + (SHIELD_COUNT - 1) * SHIELD_GAP)) / 2;
 
@@ -92,8 +93,7 @@ public class GameModel {
         playerBullet = null;
         alienBullets.clear();
         alienFireCooldownTicks = 0;
-        ufoSpawnCooldownTicks = random.nextInt(UFO_SPAWN_MAX_COOLDOWN - UFO_SPAWN_MIN_COOLDOWN + 1)
-            + UFO_SPAWN_MIN_COOLDOWN;
+        resetUfoSpawnCooldown();
         ufo = null;
         ufoDirectionX = 1;
         animFrame = true;
@@ -359,11 +359,10 @@ public class GameModel {
         }
 
         if (intersects(playerBullet, ufo.x, ufo.y, ufo.width, ufo.height)) {
-            score += SCORE_PER_UFO;
+            score += randomUfoBonusPoints();
             playerBullet = null;
             ufo = null;
-            ufoSpawnCooldownTicks = random.nextInt(UFO_SPAWN_MAX_COOLDOWN - UFO_SPAWN_MIN_COOLDOWN + 1)
-                    + UFO_SPAWN_MIN_COOLDOWN;
+            resetUfoSpawnCooldown();
         }
     }
 
@@ -453,14 +452,24 @@ public class GameModel {
     private void spawnUfo() {
         boolean moveRight = random.nextBoolean();
         int startX = moveRight ? -UFO_WIDTH : WORLD_WIDTH;
+        int maxUfoY = Math.max(0, PLAYER_Y - UFO_HEIGHT - UFO_SAFE_PLAYER_GAP_Y);
+        int startY = random.nextInt(maxUfoY + 1);
         ufoDirectionX = moveRight ? 1 : -1;
-        ufo = new Rectangle(startX, UFO_Y, UFO_WIDTH, UFO_HEIGHT);
+        ufo = new Rectangle(startX, startY, UFO_WIDTH, UFO_HEIGHT);
     }
 
     private void despawnUfo() {
         ufo = null;
+        resetUfoSpawnCooldown();
+    }
+
+    private void resetUfoSpawnCooldown() {
         ufoSpawnCooldownTicks = random.nextInt(UFO_SPAWN_MAX_COOLDOWN - UFO_SPAWN_MIN_COOLDOWN + 1)
                 + UFO_SPAWN_MIN_COOLDOWN;
+    }
+
+    private int randomUfoBonusPoints() {
+        return random.nextInt(UFO_MAX_BONUS_POINTS - UFO_MIN_BONUS_POINTS + 1) + UFO_MIN_BONUS_POINTS;
     }
 
     private void updateAnimationFrame() {

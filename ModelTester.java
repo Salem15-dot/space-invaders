@@ -15,7 +15,8 @@ public class ModelTester {
         testLosingAllLivesTriggersGameOver();
         testResetRestoresDefaultStartingState();
         testUfoDespawnsAtEdge();
-        testUfoCollisionAddsThreeHundredPoints();
+        testUfoSpawnUsesValidSideAndYRange();
+        testUfoCollisionAddsRandomBonusPoints();
         testAlienAnimationFrameTogglesAfterDelay();
 
         System.out.println();
@@ -197,7 +198,7 @@ public class ModelTester {
     private static void testUfoDespawnsAtEdge() throws Exception {
         GameModel model = new GameModel();
 
-        setPrivateField(model, "ufo", new java.awt.Rectangle(GameModel.WORLD_WIDTH - 1, GameModel.UFO_Y, GameModel.UFO_WIDTH, GameModel.UFO_HEIGHT));
+        setPrivateField(model, "ufo", new java.awt.Rectangle(GameModel.WORLD_WIDTH - 1, 20, GameModel.UFO_WIDTH, GameModel.UFO_HEIGHT));
         setPrivateIntField(model, "ufoDirectionX", 1);
         setPrivateIntField(model, "ufoSpawnCooldownTicks", 0);
 
@@ -207,17 +208,38 @@ public class ModelTester {
         assertCondition("UFO despawns safely at the opposite edge", model.getUfo() == null, "Expected UFO to be null after leaving screen");
     }
 
-    private static void testUfoCollisionAddsThreeHundredPoints() throws Exception {
+    private static void testUfoSpawnUsesValidSideAndYRange() throws Exception {
         GameModel model = new GameModel();
 
-        setPrivateField(model, "ufo", new java.awt.Rectangle(200, GameModel.UFO_Y, GameModel.UFO_WIDTH, GameModel.UFO_HEIGHT));
+        setPrivateField(model, "ufo", null);
+        setPrivateIntField(model, "ufoSpawnCooldownTicks", 0);
+        model.tick();
+
+        java.awt.Rectangle spawned = model.getUfo();
+        int maxAllowedY = Math.max(0, GameModel.PLAYER_Y - GameModel.UFO_HEIGHT - GameModel.UFO_SAFE_PLAYER_GAP_Y);
+        boolean validSide = spawned != null && (spawned.x == -GameModel.UFO_WIDTH || spawned.x == GameModel.WORLD_WIDTH);
+        boolean validY = spawned != null && spawned.y >= 0 && spawned.y <= maxAllowedY;
+
+        assertCondition("UFO spawns from a valid side", validSide, "Expected spawn x to be off-screen left or right");
+        assertCondition("UFO spawns within valid Y range", validY, "Expected spawn y between 0 and " + maxAllowedY);
+    }
+
+    private static void testUfoCollisionAddsRandomBonusPoints() throws Exception {
+        GameModel model = new GameModel();
+
+        setPrivateField(model, "ufo", new java.awt.Rectangle(200, 20, GameModel.UFO_WIDTH, GameModel.UFO_HEIGHT));
         setPrivateIntField(model, "ufoDirectionX", 0);
-        setPrivateField(model, "playerBullet", new GameModel.Bullet(200, GameModel.UFO_Y, GameModel.PLAYER_BULLET_WIDTH, GameModel.PLAYER_BULLET_HEIGHT, 0));
+        setPrivateField(model, "playerBullet", new GameModel.Bullet(200, 20, GameModel.PLAYER_BULLET_WIDTH, GameModel.PLAYER_BULLET_HEIGHT, 0));
 
         int before = model.getScore();
         model.tick();
+        int scoreDelta = model.getScore() - before;
 
-        assertCondition("UFO hit adds 300 points", model.getScore() == before + 300, "Expected score increase of 300 but was " + (model.getScore() - before));
+        assertCondition(
+                "UFO hit adds random bonus points (150-300)",
+                scoreDelta >= GameModel.UFO_MIN_BONUS_POINTS && scoreDelta <= GameModel.UFO_MAX_BONUS_POINTS,
+                "Expected score increase between 150 and 300 but was " + scoreDelta
+        );
         assertCondition("UFO is removed after collision", model.getUfo() == null, "Expected UFO to be removed after collision");
     }
 
